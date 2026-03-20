@@ -1,0 +1,12 @@
+3
+Barcelona Newcastle 1.67 4.5 3.21 Barcelona
+Atalanta Bayern 2.56 1.34 2.43 Atalanta
+Liverpool Galatasaray 1.78 2.89 3.45 Galatasaray
+2
+Barut Radu 267 3
+100 echipa1 0
+45 egal 1
+62 echipa2 2
+Ciulin Andrea 30 2
+23 egal 1
+7 echipa2 2
