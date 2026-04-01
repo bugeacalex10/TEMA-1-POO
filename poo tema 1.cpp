@@ -20,71 +20,110 @@
 #include<fstream>
 #include<vector>
 #include<string>
+#include<cstring>
 //declarare biblioteci necesare
 
 class meci{
     private:
-        std::string echipa1;
-        std::string echipa2;
+        char* echipa1;
+        char* echipa2;
         float cota_echipa1;
         float cota_egal;
         float cota_echipa2;
-        std::string rezultat;
+        char* rezultat;
         //variabile private pentru clasa meci
     public:
-        meci () : echipa1(""), echipa2(""), cota_echipa1(0), cota_egal(0), cota_echipa2(0),
-        rezultat("") {}
+        inline meci () : echipa1(nullptr), echipa2(nullptr), cota_echipa1(0), cota_egal(0), cota_echipa2(0),
+        rezultat(nullptr) {}
         //constructor default
-        meci (const std::string& e1, const std::string& e2, float c1, float eg, float c2)
+        inline meci (const std::string& e1, const std::string& e2, float c1, float eg, float c2)
         {
-            echipa1 = e1;
-            echipa2 = e2;
+            echipa1 = new char[e1.length()+1];
+            strcpy(echipa1, e1.c_str());
+            echipa2 = new char[e2.length()+1];
+            strcpy(echipa2, e2.c_str());
             cota_echipa1 = c1;
             cota_egal = eg;
             cota_echipa2 = c2;
-            rezultat = "";
+            rezultat = nullptr;
         }
         //constructor cu parametri
-        meci (const meci& m)
+        inline meci (const meci& m)
         {
-            echipa1 = m.echipa1;
-            echipa2 = m.echipa2;
+            if (m.echipa1) {
+                echipa1 = new char[strlen(m.echipa1)+1];
+                strcpy(echipa1, m.echipa1);
+            } else echipa1 = nullptr;
+            if (m.echipa2) {
+                echipa2 = new char[strlen(m.echipa2)+1];
+                strcpy(echipa2, m.echipa2);
+            } else echipa2 = nullptr;
             cota_echipa1 = m.cota_echipa1;
             cota_egal = m.cota_egal;
             cota_echipa2 = m.cota_echipa2;
-            rezultat = m.rezultat;
+            if (m.rezultat) {
+                rezultat = new char[strlen(m.rezultat)+1];
+                strcpy(rezultat, m.rezultat);
+            } else rezultat = nullptr;
         }
         //constructor de copiere
         meci& operator= (const meci& m)
         {
             if (this != &m)
             {
-                echipa1 = m.echipa1;
-                echipa2 = m.echipa2;
+                delete[] echipa1;
+                delete[] echipa2;
+                delete[] rezultat;
+                if (m.echipa1) {
+                    echipa1 = new char[strlen(m.echipa1)+1];
+                    strcpy(echipa1, m.echipa1);
+                } else echipa1 = nullptr;
+                if (m.echipa2) {
+                    echipa2 = new char[strlen(m.echipa2)+1];
+                    strcpy(echipa2, m.echipa2);
+                } else echipa2 = nullptr;
                 cota_echipa1 = m.cota_echipa1;
                 cota_egal = m.cota_egal;
                 cota_echipa2 = m.cota_echipa2;
-                rezultat = m.rezultat;
+                if (m.rezultat) {
+                    rezultat = new char[strlen(m.rezultat)+1];
+                    strcpy(rezultat, m.rezultat);
+                } else rezultat = nullptr;
             }
             return *this;
         }
         //operator de asignare
         void rezultat_meci(const std::string& rez)
         {
-            rezultat = rez;
+            delete[] rezultat;
+            rezultat = new char[rez.length()+1];
+            strcpy(rezultat, rez.c_str());
         }
         //functie pentru a seta rezultatul meciului
+        float get_cota_echipa1() const
+        {
+            return cota_echipa1;
+        }
+        float get_cota_egal() const
+        {
+            return cota_egal;
+        }
+        float get_cota_echipa2() const
+        {
+            return cota_echipa2;
+        }
+        //getteri pentru cote
         float verificare_sum_castigata(const std::string& alegere)
         {
-            if (alegere == "echipa1" && rezultat == echipa1)
+            if (alegere == "echipa1" && rezultat && strcmp(rezultat, echipa1) == 0)
             {
                 return cota_echipa1;
             }
-            else if (alegere == "egal" && rezultat == "egal")
+            else if (alegere == "egal" && rezultat && strcmp(rezultat, "egal") == 0)
             {
                 return cota_egal;
             }
-            else if (alegere == "echipa2" && rezultat == echipa2)
+            else if (alegere == "echipa2" && rezultat && strcmp(rezultat, echipa2) == 0)
             {
                 return cota_echipa2;
             }
@@ -94,7 +133,12 @@ class meci{
             }
         }
         //functie de verificare a alegerii clientului si returnarea cotei corespunzatoare
-        ~meci(){}
+        inline ~meci()
+        {
+            delete[] echipa1;
+            delete[] echipa2;
+            delete[] rezultat;
+        }
         //destructor
 };
 //clasa pentru meciuri
@@ -107,16 +151,16 @@ class pariu{
         int index_meci;
         //variabile private pentru clasa pariu
     public:
-        pariu () : suma(0), echipa_aleasa(""), index_meci(0) {}
+        inline pariu () : suma(0), echipa_aleasa(""), index_meci(0) {}
         //constructor default
-        pariu (float s, const std::string& alegerea, int ind)
+        inline pariu (float s, const std::string& alegerea, int ind)
         {
             suma = s;
             echipa_aleasa = alegerea;
             index_meci = ind;
         }
         //constructor cu parametri
-        pariu (const pariu& p)
+        inline pariu (const pariu& p)
         {
             suma = p.suma;
             echipa_aleasa = p.echipa_aleasa;
@@ -146,7 +190,7 @@ class pariu{
         }
         //functia pentru returnarea sumei castigate sau pierdute in functie de alegerea
         //clientului si rezultatul meciului
-        ~pariu(){}
+        inline ~pariu(){}
         //destructot
 };
 //clasa pentru pariuri
@@ -159,11 +203,12 @@ class client{
         std::vector<pariu> pariuri;
         float buget;
         float suma_castigata = 0;
+        int nr_clienti;
         //variabile private pentru clasa client
     public:
-        client () : nume(""), prenume(""), buget(0), pariuri({}) {}
+        inline client () : nume(""), prenume(""), buget(0), pariuri({}) {}
         //constructor default
-        client (const std::string& n, const std::string& p, float b, std::vector<pariu> gamble)
+        inline client (const std::string& n, const std::string& p, float b, std::vector<pariu> gamble)
         {
             nume = n;
             prenume = p;
@@ -171,7 +216,7 @@ class client{
             pariuri = gamble;
         }
         //constructor cu parametri
-        client (const client& c)
+        inline client (const client& c)
         {
             nume = c.nume;
             prenume = c.prenume;
@@ -198,6 +243,9 @@ class client{
         //functie de adaugare a unui pariu intr-un vector pentru pariurile clientului
         void calculare_castiguri(std::vector<meci>& meciuri)
         {
+            static int nr_clienti = 0;
+            nr_clienti++;
+
             for(int ind = 0; ind < pariuri.size(); ind++)
             {
                 buget += pariuri[ind].ret_suma(meciuri);
@@ -213,7 +261,11 @@ class client{
         {
             return prenume;
         }
-        //getter pentru prenumele clientului
+        std::string set_prenume(const std::string& p)
+        {
+            prenume = p;
+        }
+        //setter pentru prenumele clientului
         float get_buget() const
         {
             return buget;
@@ -225,7 +277,7 @@ class client{
             return out;
         }
         //operator de afisare al numelui, prenumelui si bugetului final al clientului
-        ~client(){}
+        inline ~client(){}
         //destructor
 };
 //clasa pentru clienti
@@ -242,6 +294,10 @@ int main()
     //declarare si citire numar de meciuri
     std::vector<meci> meciuri;
     //declarare vector pentru meciuri
+    char d[3], n[3];
+    strcpy(d,"DA");
+    strcpy(n,"NU");
+
 
     for(int ind = 0; ind < nrmeciuri; ind++)
     {
@@ -311,11 +367,11 @@ int main()
         //apelare functie de calculare a castigurilor sau a pierderilor
         if (clienti[ind].get_buget() > buget_initial[ind])
         {
-            fout << "📈 "; 
+            fout << d << " "; 
         }
         else
         {
-            fout << "📉 ";
+            fout << n << " ";
         }
         //if pentru verificare daca clientul a facut profit sau nu
         if(ind != clienti.size() - 1)
